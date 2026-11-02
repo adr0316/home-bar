@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black">
+<meta name="apple-mobile-web-app-title" content="The Home Bar">
+<title>The Home Bar | Cocktail Menu</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;min-height:100%;background:#14120f;color:#f4e9d4;font-family:Georgia,"Times New Roman",serif}
+header{padding:22px 25px 15px;border-bottom:1px solid #6c5331;text-align:center;background:#1d1915}
+.eyebrow{font:11px Arial,sans-serif;letter-spacing:4px;color:#c9a56d;text-transform:uppercase}
+h1{font-size:36px;font-weight:normal;margin:8px 0 4px;letter-spacing:2px}header p{font-size:13px;color:#b9a58a;margin:5px}
+nav{padding:14px;text-align:center;background:#191612}
+button{cursor:pointer;-webkit-appearance:none;border-radius:3px;border:1px solid #8d704a;background:transparent;color:#f4e9d4;padding:12px 18px;font:14px Arial,sans-serif;margin:3px}
+button.active,.primary{background:#b78a4b;color:#18130e;border-color:#b78a4b}
+main{max-width:1000px;margin:0 auto;padding:15px 20px 40px}
+.intro{text-align:center;color:#c9b89e;font-size:15px;margin:8px 0 20px}
+.grid{overflow:hidden}.tile{float:left;width:48%;margin:0 1% 18px;background:#252019;border:1px solid #59472e;min-height:185px}
+.tile .art{height:92px;background:#35271e;position:relative;overflow:hidden;text-align:center}
+.glass{display:inline-block;font-size:66px;line-height:92px;color:#c69a59}
+.tile .body{padding:13px 15px}.tile h2{font-size:21px;font-weight:normal;margin:0 0 6px}.tile p{font:12px Arial,sans-serif;color:#c9b89e;margin:0 0 12px}
+.tile button{padding:8px 13px;margin:0;font-size:12px}
+#detail{display:none;max-width:650px;margin:0 auto;background:#252019;border:1px solid #59472e;padding:22px}
+#detail h2{font-size:32px;font-weight:normal;margin:12px 0}
+#detail .symbol{text-align:center;font-size:72px;color:#c69a59}
+#detail h3{font:12px Arial,sans-serif;letter-spacing:2px;text-transform:uppercase;color:#c9a56d;border-bottom:1px solid #59472e;padding-bottom:8px;margin-top:22px}
+#detail li{padding:5px 0;line-height:1.4}#detail p{line-height:1.6;color:#dfd0b7}
+#back{margin:0 0 8px}footer{text-align:center;color:#8d7b64;font:11px Arial,sans-serif;padding:20px}
+@media(min-width:900px){.tile{width:31.33%;min-height:190px}}
+@media(max-width:520px){.tile{width:98%;min-height:0}h1{font-size:30px}.tile .art{height:70px}.glass{line-height:70px;font-size:52px}}
+</style>
+</head>
+<body>
+<header><div class="eyebrow">A private collection of cocktails</div><h1>THE HOME BAR</h1><p>Crafted at home · Served with style</p></header>
+<nav id="filters"><button class="active" data-filter="All">All Drinks</button><button data-filter="Whiskey">Whiskey</button><button data-filter="Rum">Rum</button><button data-filter="Favorites">Favorites ★</button></nav>
+<main>
+<section id="browse"><p class="intro">Select a cocktail to explore its recipe.</p><div id="grid" class="grid"></div></section>
+<section id="detail"><button id="back">← Back to Menu</button><div class="symbol" id="symbol"></div><h2 id="drinkname"></h2><p id="description"></p><button id="favorite" class="primary"></button><h3>Ingredients</h3><ul id="ingredients"></ul><h3>Preparation</h3><p id="method"></p></section>
+</main><footer>THE HOME BAR · YOUR PERSONAL COCKTAIL COLLECTION</footer>
+<script>
+(function(){
+var drinks=[
+{id:1,name:"Jameson & Ginger",category:"Whiskey",symbol:"◆",description:"Bright, refreshing Irish whiskey with ginger ale.",ingredients:["2 oz Jameson Irish Whiskey","4–6 oz ginger ale","Ice","Optional: 1 dash orange bitters"],method:"Fill a highball glass with ice. Add whiskey, top with ginger ale, and stir gently. Add orange bitters if desired."},
+{id:2,name:"Simple Whiskey Old Fashioned",category:"Whiskey",symbol:"◇",description:"A stripped-back classic made with what you have.",ingredients:["2 oz whiskey","1 tsp sugar","2–3 dashes orange bitters","1 tsp water","Ice"],method:"Dissolve sugar with bitters and water in a glass. Add whiskey and ice, then stir until chilled."},
+{id:3,name:"Rum & Ginger",category:"Rum",symbol:"✦",description:"An easy, spicy-sweet highball.",ingredients:["2 oz rum","4–6 oz ginger ale","Ice","Optional: lime wedge"],method:"Fill a tall glass with ice. Pour in rum, top with ginger ale, and stir gently. Garnish with lime if available."},
+{id:4,name:"Peach Royal & Ginger",category:"Whiskey",symbol:"✧",description:"Peach-forward and easy to sip.",ingredients:["2 oz Crown Royal Peach","4–6 oz ginger ale","Ice"],method:"Add Crown Royal Peach to an ice-filled glass. Top with ginger ale and stir gently."}
+];
+var favorites={},filter="All";
+try{favorites=JSON.parse(localStorage.getItem("homebar_favorites")||"{}")||{}}catch(e){}
+function byId(id){return document.getElementById(id)}
+function save(){try{localStorage.setItem("homebar_favorites",JSON.stringify(favorites))}catch(e){}}
+function render(){var grid=byId("grid");grid.innerHTML="";var count=0;
+for(var i=0;i<drinks.length;i++){var d=drinks[i];if(filter!=="All"&&filter!=="Favorites"&&d.category!==filter)continue;if(filter==="Favorites"&&!favorites[d.id])continue;count++;
+var tile=document.createElement("div");tile.className="tile";
+tile.innerHTML='<div class="art"><span class="glass">'+d.symbol+'</span></div><div class="body"><h2>'+d.name+'</h2><p>'+d.category+' · '+(favorites[d.id]?'★ Favorite':'Cocktail')+'</p><button data-id="'+d.id+'">View Recipe →</button></div>';
+grid.appendChild(tile)}
+if(!count)grid.innerHTML='<p class="intro">No cocktails in this category yet.</p>';
+var buttons=grid.getElementsByTagName("button");for(var j=0;j<buttons.length;j++)buttons[j].onclick=function(){openDrink(parseInt(this.getAttribute("data-id"),10))}}
+var selected;
+function openDrink(id){for(var i=0;i<drinks.length;i++)if(drinks[i].id===id)selected=drinks[i];
+byId("browse").style.display="none";byId("detail").style.display="block";
+byId("symbol").innerHTML=selected.symbol;byId("drinkname").innerHTML=selected.name;byId("description").innerHTML=selected.description;
+var li="";for(var j=0;j<selected.ingredients.length;j++)li+="<li>"+selected.ingredients[j]+"</li>";byId("ingredients").innerHTML=li;
+byId("method").innerHTML=selected.method;updateFavorite();window.scrollTo(0,0)}
+function updateFavorite(){byId("favorite").innerHTML=favorites[selected.id]?"★ Remove Favorite":"☆ Add to Favorites"}
+byId("favorite").onclick=function(){if(favorites[selected.id])delete favorites[selected.id];else favorites[selected.id]=true;save();updateFavorite()};
+byId("back").onclick=function(){byId("detail").style.display="none";byId("browse").style.display="block";render();window.scrollTo(0,0)};
+var nav=byId("filters").getElementsByTagName("button");for(var k=0;k<nav.length;k++)nav[k].onclick=function(){filter=this.getAttribute("data-filter");for(var n=0;n<nav.length;n++)nav[n].className="";this.className="active";byId("detail").style.display="none";byId("browse").style.display="block";render()};
+render();
+})();
+</script>
+</body>
+</html>
